@@ -14,6 +14,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
+import ua.nure.nlebed.utils.MacAddressUtils;
 
 import java.util.Objects;
 
@@ -22,6 +23,8 @@ public class SignInActivity extends AppCompatActivity implements
 
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
+
+    private static final String NURE_UA_DOMAIN = "@nure.ua";
 
     private GoogleSignInClient mGoogleSignInClient;
     private TextView mStatusTextView;
@@ -54,7 +57,6 @@ public class SignInActivity extends AppCompatActivity implements
         updateUI(account);
     }
 
-    // [START onActivityResult]
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -68,7 +70,15 @@ public class SignInActivity extends AppCompatActivity implements
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             Log.w("MY TAG", account.getEmail());
-            if (Objects.requireNonNull(account.getEmail()).contains("@nure.ua")) {
+            String wlan0 = MacAddressUtils.getMACAddress("wlan0");
+            String eth0 = MacAddressUtils.getMACAddress("eth0");
+
+            Log.w("MAC ADDRESSES: wlan0 ", wlan0);
+
+            // send mac to my server then server will check
+            // also we can send nure ua user information (email, name, etc.)
+
+            if ((Objects.requireNonNull(account.getEmail())).endsWith(NURE_UA_DOMAIN)) {
                 updateUI(account);
             } else {
                 updateUI(null);
