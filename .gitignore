@@ -167,3 +167,4 @@ gradle-app.setting
 # gradle/wrapper/gradle-wrapper.properties
 
 /.idea/
+/ruckus-wireless-android-client.iml
