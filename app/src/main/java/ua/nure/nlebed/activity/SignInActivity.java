@@ -1,4 +1,4 @@
-package ua.nure.nlebed;
+package ua.nure.nlebed.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,6 +19,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
+import ua.nure.nlebed.R;
 import ua.nure.nlebed.utils.JsonUtils;
 
 import java.util.Objects;
@@ -76,13 +77,11 @@ public class SignInActivity extends AppCompatActivity implements
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-
             HttpClient httpclient = new DefaultHttpClient();
 
-            HttpPost httpPost = createSendUserHttpRequest(account);
-            httpclient.execute(httpPost);
-
             if ((Objects.requireNonNull(account.getEmail())).endsWith(NURE_UA_DOMAIN)) {
+                HttpPost httpPost = createSendUserHttpRequest(account);
+                httpclient.execute(httpPost);
                 updateUI(account);
             } else {
                 updateUI(null);
@@ -116,15 +115,14 @@ public class SignInActivity extends AppCompatActivity implements
 
     private void updateUI(GoogleSignInAccount account) {
         if (account != null) {
-            mStatusTextView.setText(getString(R.string.signed_in_fmt, account.getDisplayName()));
-
+            mStatusTextView.setText(getString(R.string.signed_in_fmt, account.getEmail()));
             findViewById(R.id.sign_in_button).setVisibility(View.GONE);
-            findViewById(R.id.sign_out_and_disconnect).setVisibility(View.VISIBLE);
+            findViewById(R.id.sign_out).setVisibility(View.VISIBLE);
         } else {
-            mStatusTextView.setText(R.string.signed_out);
-
+            mStatusTextView.setText(R.string.sign_in_with_nure_google_domain);
             findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
-            findViewById(R.id.sign_out_and_disconnect).setVisibility(View.GONE);
+            findViewById(R.id.sign_out).setVisibility(View.GONE);
+            mGoogleSignInClient.signOut();
         }
     }
 
@@ -139,4 +137,4 @@ public class SignInActivity extends AppCompatActivity implements
                 break;
         }
     }
- }
+}
