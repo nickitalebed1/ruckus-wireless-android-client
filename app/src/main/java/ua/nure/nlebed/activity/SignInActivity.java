@@ -45,7 +45,7 @@ public class SignInActivity extends AppCompatActivity implements
         mStatusTextView = findViewById(R.id.status);
 
         findViewById(R.id.sign_in_button).setOnClickListener(this);
-        findViewById(R.id.sign_out_button).setOnClickListener(this);
+        findViewById(R.id.sign_out_button).setOnClickListener(f -> finish());
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
