@@ -3,7 +3,6 @@ package ua.nure.nlebed;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -15,15 +14,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONException;
 import org.json.JSONObject;
 import ua.nure.nlebed.utils.JsonUtils;
-import ua.nure.nlebed.utils.MacAddressUtils;
 
 import java.util.Objects;
 
@@ -34,7 +30,6 @@ public class SignInActivity extends AppCompatActivity implements
     private static final int RC_SIGN_IN = 9001;
 
     private static final String NURE_UA_DOMAIN = "@nure.ua";
-    public static final String ANDROID = "ANDROID";
 
     private GoogleSignInClient mGoogleSignInClient;
     private TextView mStatusTextView;
@@ -84,11 +79,7 @@ public class SignInActivity extends AppCompatActivity implements
 
             HttpClient httpclient = new DefaultHttpClient();
 
-            HttpPost httpPost = new HttpPost("http://10.0.2.2:8080/rest/user");
-            JSONObject userJson = JsonUtils.createUserJson(account);
-            httpPost.setEntity(new StringEntity(userJson.toString()));
-            httpPost.setHeader("Accept", "application/json");
-            httpPost.setHeader("Content-Type", "application/json; charset=UTF-8");
+            HttpPost httpPost = createSendUserHttpRequest(account);
             httpclient.execute(httpPost);
 
             if ((Objects.requireNonNull(account.getEmail())).endsWith(NURE_UA_DOMAIN)) {
@@ -99,11 +90,18 @@ public class SignInActivity extends AppCompatActivity implements
         } catch (ApiException e) {
             Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
             updateUI(null);
-        } catch (ClientProtocolException e) {
-            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private HttpPost createSendUserHttpRequest(GoogleSignInAccount account) throws Exception {
+        HttpPost httpPost = new HttpPost("http://10.0.2.2:8080/rest/user");
+        JSONObject userJson = JsonUtils.createUserJson(account);
+        httpPost.setEntity(new StringEntity(userJson.toString()));
+        httpPost.setHeader("Accept", "application/json");
+        httpPost.setHeader("Content-Type", "application/json; charset=UTF-8");
+        return httpPost;
     }
 
     private void signIn() {
@@ -116,7 +114,7 @@ public class SignInActivity extends AppCompatActivity implements
                 .addOnCompleteListener(this, task -> updateUI(null));
     }
 
-    private void updateUI(@Nullable GoogleSignInAccount account) {
+    private void updateUI(GoogleSignInAccount account) {
         if (account != null) {
             mStatusTextView.setText(getString(R.string.signed_in_fmt, account.getDisplayName()));
 

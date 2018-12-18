@@ -5,7 +5,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonUtils {
-    public static final String ANDROID = "ANDROID";
+
+    private static final String ANDROID = "ANDROID";
 
     public static JSONObject createUserJson(GoogleSignInAccount account) throws JSONException {
         String wlan0 = MacAddressUtils.getMACAddress("wlan0");
