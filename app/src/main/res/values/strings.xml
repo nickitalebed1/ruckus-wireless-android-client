@@ -1,5 +1,4 @@
 <resources>
-    <string name="send_user_url">http://10.0.2.2:8080/rest/user</string>
 
     <string name="app_name">Nure Wifi Auth</string>
     <string name="title_text">Nure Wifi Auth</string>

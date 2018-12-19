@@ -19,6 +19,7 @@ public class JsonUtils {
         userJson.put("macAddress", wlan0);
         userJson.put("ipAddress", "nothing");
         userJson.put("device", ANDROID);
+        userJson.put("photoUrl", account.getPhotoUrl());
         return userJson;
     }
 
