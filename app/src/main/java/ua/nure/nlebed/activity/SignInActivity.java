@@ -45,7 +45,8 @@ public class SignInActivity extends AppCompatActivity implements
         mStatusTextView = findViewById(R.id.status);
 
         findViewById(R.id.sign_in_button).setOnClickListener(this);
-        findViewById(R.id.sign_out_button).setOnClickListener(f -> finish());
+//        findViewById(R.id.sign_out_button).setOnClickListener(f -> finish());
+        findViewById(R.id.sign_out_button).setOnClickListener(this);
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
@@ -77,11 +78,8 @@ public class SignInActivity extends AppCompatActivity implements
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            HttpClient httpclient = new DefaultHttpClient();
-
             if ((Objects.requireNonNull(account.getEmail())).endsWith(NURE_UA_DOMAIN)) {
-                HttpPost httpPost = createSendUserHttpRequest(account);
-                httpclient.execute(httpPost);
+                sendCreateUserHttpRequest(account);
                 updateUI(account);
             } else {
                 updateUI(null);
@@ -94,13 +92,15 @@ public class SignInActivity extends AppCompatActivity implements
         }
     }
 
-    private HttpPost createSendUserHttpRequest(GoogleSignInAccount account) throws Exception {
-        HttpPost httpPost = new HttpPost("http://10.0.2.2:8080/rest/user");
+    private void sendCreateUserHttpRequest(GoogleSignInAccount account) throws Exception {
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpPost httpPost = new HttpPost(getString(R.string.send_user_url));
         JSONObject userJson = JsonUtils.createUserJson(account);
         httpPost.setEntity(new StringEntity(userJson.toString()));
         httpPost.setHeader("Accept", "application/json");
         httpPost.setHeader("Content-Type", "application/json; charset=UTF-8");
-        return httpPost;
+        httpclient.execute(httpPost);
+
     }
 
     private void signIn() {
