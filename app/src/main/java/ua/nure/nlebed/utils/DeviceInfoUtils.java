@@ -5,15 +5,13 @@ import java.net.NetworkInterface;
 import java.util.Collections;
 import java.util.List;
 
-public class InternetUtils {
+public class DeviceInfoUtils {
 
-    public static String getMACAddress(String interfaceName) {
+    static String getMACAddress() {
         try {
             List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
             for (NetworkInterface aInterface : interfaces) {
-                if (interfaceName != null) {
-                    if (!aInterface.getName().equalsIgnoreCase(interfaceName)) continue;
-                }
+                if (!aInterface.getName().equalsIgnoreCase("wlan0")) continue;
                 byte[] mac = aInterface.getHardwareAddress();
                 if (mac == null) return "";
                 StringBuilder buf = new StringBuilder();
@@ -27,7 +25,7 @@ public class InternetUtils {
         return "";
     }
 
-    public static String getIPAddress(boolean useIPv4) {
+    static String getIPAddress() {
         try {
             List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
             for (NetworkInterface intf : interfaces) {
@@ -36,16 +34,9 @@ public class InternetUtils {
                     if (!addr.isLoopbackAddress()) {
                         String sAddr = addr.getHostAddress();
                         boolean isIPv4 = sAddr.indexOf(':') < 0;
+                        if (isIPv4)
+                            return sAddr;
 
-                        if (useIPv4) {
-                            if (isIPv4)
-                                return sAddr;
-                        } else {
-                            if (!isIPv4) {
-                                int delim = sAddr.indexOf('%'); // drop ip6 zone suffix
-                                return delim < 0 ? sAddr.toUpperCase() : sAddr.substring(0, delim).toUpperCase();
-                            }
-                        }
                     }
                 }
             }
