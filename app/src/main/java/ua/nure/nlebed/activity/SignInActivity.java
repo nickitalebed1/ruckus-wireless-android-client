@@ -94,6 +94,7 @@ public class SignInActivity extends AppCompatActivity implements
 
     private void sendCreateUserHttpRequest(GoogleSignInAccount account) throws Exception {
         HttpClient httpclient = new DefaultHttpClient();
+//        HttpPost httpPost = new HttpPost("http://10.0.2.2:8080/rest/user");
         HttpPost httpPost = new HttpPost("https://nure-ruckus-users-control.herokuapp.com/rest/user");
         JSONObject userJson = JsonUtils.createUserJson(account);
         httpPost.setEntity(new StringEntity(userJson.toString()));

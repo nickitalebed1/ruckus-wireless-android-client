@@ -3,7 +3,7 @@
     android:id="@+id/main_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/blue_grey_700"
+    android:background="@color/blue_grey_500"
     android:orientation="vertical"
     android:weightSum="4"
     tools:context=".activity.SignInActivity">
@@ -17,12 +17,12 @@
 
         <ImageView
             android:id="@+id/google_icon"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_marginBottom="10dp"
             android:layout_marginTop="@dimen/g_top_margin"
             android:contentDescription="@string/desc_google_icon"
-            android:src="@drawable/googleg_color" />
+            android:src="@drawable/nure1" />
 
         <TextView
             android:id="@+id/title_text"
@@ -82,12 +82,10 @@
 
         <LinearLayout
             android:id="@+id/sign_out"
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:orientation="horizontal"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
             android:visibility="gone"
             tools:visibility="visible">
 
