@@ -10,7 +10,7 @@ public class JsonUtils {
 
     public static JSONObject createUserJson(GoogleSignInAccount account) throws JSONException {
         String wlan0 = DeviceInfoUtils.getMACAddress();
-        String ipAddress = DeviceInfoUtils.getIPAddress(true);
+        String ipAddress = DeviceInfoUtils.getIPAddress();
         JSONObject userJson = new JSONObject();
         String email = account.getEmail();
         int indexOf = email.indexOf('.');
