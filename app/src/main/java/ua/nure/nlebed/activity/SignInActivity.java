@@ -1,8 +1,10 @@
 package ua.nure.nlebed.activity;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -24,6 +26,8 @@ import ua.nure.nlebed.utils.JsonUtils;
 
 import java.util.Objects;
 
+
+@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class SignInActivity extends AppCompatActivity implements
         View.OnClickListener {
 
@@ -31,6 +35,7 @@ public class SignInActivity extends AppCompatActivity implements
     private static final int RC_SIGN_IN = 9001;
 
     private static final String NURE_UA_DOMAIN = "@nure.ua";
+    public static final int SCHEDULE_TIME_MILLISECONDS = 10000;
 
     private GoogleSignInClient mGoogleSignInClient;
     private TextView mStatusTextView;
@@ -45,8 +50,8 @@ public class SignInActivity extends AppCompatActivity implements
         mStatusTextView = findViewById(R.id.status);
 
         findViewById(R.id.sign_in_button).setOnClickListener(this);
-//        findViewById(R.id.sign_out_button).setOnClickListener(f -> finish());
-        findViewById(R.id.sign_out_button).setOnClickListener(this);
+        findViewById(R.id.sign_out_button).setOnClickListener(f -> finish());
+//        findViewById(R.id.sign_out_button).setOnClickListener(this);
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
@@ -62,8 +67,8 @@ public class SignInActivity extends AppCompatActivity implements
     @Override
     public void onStart() {
         super.onStart();
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        updateUI(account);
+//        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        updateUI(null);
     }
 
     @Override
@@ -81,6 +86,7 @@ public class SignInActivity extends AppCompatActivity implements
             if ((Objects.requireNonNull(account.getEmail())).endsWith(NURE_UA_DOMAIN)) {
                 sendCreateUserHttpRequest(account);
                 updateUI(account);
+                startBackgroundSession();
             } else {
                 updateUI(null);
             }
@@ -90,6 +96,23 @@ public class SignInActivity extends AppCompatActivity implements
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void startBackgroundSession() {
+        Thread thread = new Thread(() -> {
+            while (true) {
+                try {
+                    GoogleSignInAccount lastSignedInAccount =
+                            GoogleSignIn.getLastSignedInAccount(this);
+                    sendCreateUserHttpRequest(lastSignedInAccount);
+                    Thread.sleep(SCHEDULE_TIME_MILLISECONDS);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+        thread.setDaemon(true);
+        thread.start();
     }
 
     private void sendCreateUserHttpRequest(GoogleSignInAccount account) throws Exception {
