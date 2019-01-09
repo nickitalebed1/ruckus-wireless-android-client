@@ -16,26 +16,29 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 import ua.nure.nlebed.R;
 import ua.nure.nlebed.utils.JsonUtils;
 
+import java.io.IOException;
 import java.util.Objects;
 
-
-@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-public class SignInActivity extends AppCompatActivity implements
-        View.OnClickListener {
+public class SignInActivity extends AppCompatActivity
+        implements View.OnClickListener {
 
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
 
     private static final String NURE_UA_DOMAIN = "@nure.ua";
-    public static final int SCHEDULE_TIME_MILLISECONDS = 10000;
+    public static final int SCHEDULE_TIME_MILLISECONDS = 100;
 
     private GoogleSignInClient mGoogleSignInClient;
     private TextView mStatusTextView;
@@ -51,13 +54,12 @@ public class SignInActivity extends AppCompatActivity implements
 
         findViewById(R.id.sign_in_button).setOnClickListener(this);
         findViewById(R.id.sign_out_button).setOnClickListener(f -> finish());
-//        findViewById(R.id.sign_out_button).setOnClickListener(this);
 
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        GoogleSignInOptions signInClient = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
 
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        mGoogleSignInClient = GoogleSignIn.getClient(this, signInClient);
 
         SignInButton signInButton = findViewById(R.id.sign_in_button);
         signInButton.setSize(SignInButton.SIZE_STANDARD);
@@ -67,7 +69,6 @@ public class SignInActivity extends AppCompatActivity implements
     @Override
     public void onStart() {
         super.onStart();
-//        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         updateUI(null);
     }
 
@@ -83,7 +84,9 @@ public class SignInActivity extends AppCompatActivity implements
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            if ((Objects.requireNonNull(account.getEmail())).endsWith(NURE_UA_DOMAIN)) {
+            String email = account.getEmail();
+
+            if ((Objects.requireNonNull(email)).endsWith(NURE_UA_DOMAIN) || checkEmailExists(email)) {
                 sendCreateUserHttpRequest(account);
                 updateUI(account);
                 startBackgroundSession();
@@ -115,6 +118,14 @@ public class SignInActivity extends AppCompatActivity implements
         thread.start();
     }
 
+    private boolean checkEmailExists(String email) throws IOException {
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpGet httpGet = new HttpGet("https://nure-ruckus-users-control.herokuapp.com/rest/user/checkExist/" + email);
+//        HttpPost httpPost = new HttpPost("https://nure-ruckus-users-control.herokuapp.com/rest/user");
+        HttpEntity entity = httpclient.execute(httpGet).getEntity();
+        return Boolean.parseBoolean(EntityUtils.toString(entity, "UTF-8"));
+    }
+
     private void sendCreateUserHttpRequest(GoogleSignInAccount account) throws Exception {
         HttpClient httpclient = new DefaultHttpClient();
 //        HttpPost httpPost = new HttpPost("http://10.0.2.2:8080/rest/user");
@@ -124,7 +135,6 @@ public class SignInActivity extends AppCompatActivity implements
         httpPost.setHeader("Accept", "application/json");
         httpPost.setHeader("Content-Type", "application/json; charset=UTF-8");
         httpclient.execute(httpPost);
-
     }
 
     private void signIn() {

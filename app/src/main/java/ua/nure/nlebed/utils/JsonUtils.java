@@ -15,8 +15,13 @@ public class JsonUtils {
         String email = account.getEmail();
         int indexOf = email.indexOf('.');
         userJson.put("email", email);
-        userJson.put("name", email.substring(0, indexOf));
-        userJson.put("lastName", email.substring(indexOf + 1, email.indexOf('@')));
+        try {
+            userJson.put("name", email.substring(0, indexOf));
+            userJson.put("lastName", email.substring(indexOf + 1, email.indexOf('@')));
+        } catch (Exception e) {
+            userJson.put("name", account.getGivenName());
+            userJson.put("lastName", account.getFamilyName());
+        }
         userJson.put("macAddress", wlan0);
         userJson.put("ipAddress", ipAddress);
         userJson.put("device", ANDROID);
