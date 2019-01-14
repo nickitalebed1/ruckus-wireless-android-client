@@ -1,10 +1,8 @@
 package ua.nure.nlebed.activity;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -17,7 +15,6 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -89,7 +86,11 @@ public class SignInActivity extends AppCompatActivity
             if ((Objects.requireNonNull(email)).endsWith(NURE_UA_DOMAIN) || checkEmailExists(email)) {
                 sendCreateUserHttpRequest(account);
                 updateUI(account);
-                startBackgroundSession();
+//                try {
+//                    startBackgroundSession();
+//                } catch (RuntimeException e) {
+//                    updateUI(null);
+//                }
             } else {
                 updateUI(null);
             }
@@ -120,7 +121,7 @@ public class SignInActivity extends AppCompatActivity
 
     private boolean checkEmailExists(String email) throws IOException {
         HttpClient httpclient = new DefaultHttpClient();
-        HttpGet httpGet = new HttpGet("https://nure-ruckus-users-control.herokuapp.com/rest/user/checkExist/" + email);
+        HttpGet httpGet = new HttpGet("https://nure-ruckus-users-control.herokuapp.com//rest/user/checkExist/" + email);
 //        HttpPost httpPost = new HttpPost("https://nure-ruckus-users-control.herokuapp.com/rest/user");
         HttpEntity entity = httpclient.execute(httpGet).getEntity();
         return Boolean.parseBoolean(EntityUtils.toString(entity, "UTF-8"));
