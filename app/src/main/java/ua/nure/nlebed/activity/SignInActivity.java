@@ -82,15 +82,9 @@ public class SignInActivity extends AppCompatActivity
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             String email = account.getEmail();
-
             if ((Objects.requireNonNull(email)).endsWith(NURE_UA_DOMAIN) || checkEmailExists(email)) {
                 sendCreateUserHttpRequest(account);
                 updateUI(account);
-//                try {
-//                    startBackgroundSession();
-//                } catch (RuntimeException e) {
-//                    updateUI(null);
-//                }
             } else {
                 updateUI(null);
             }
@@ -100,23 +94,6 @@ public class SignInActivity extends AppCompatActivity
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private void startBackgroundSession() {
-        Thread thread = new Thread(() -> {
-            while (true) {
-                try {
-                    GoogleSignInAccount lastSignedInAccount =
-                            GoogleSignIn.getLastSignedInAccount(this);
-                    sendCreateUserHttpRequest(lastSignedInAccount);
-                    Thread.sleep(SCHEDULE_TIME_MILLISECONDS);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-        thread.setDaemon(true);
-        thread.start();
     }
 
     private boolean checkEmailExists(String email) throws IOException {
